@@ -1,6 +1,6 @@
 {
   "name": "datavue",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "main": "./dist/datavue.common.js",
   "files": [
     "dist/*",
@@ -11,7 +11,8 @@
   "scripts": {
     "serve": "vue-cli-service serve ./src/demo.js",
     "build": "vue-cli-service build --target lib --name datavue ./src/main.js",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "publish": "npm run build && npm publish"
   },
   "dependencies": {
     "core-js": "^2.6.5",

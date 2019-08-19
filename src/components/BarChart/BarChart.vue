@@ -279,7 +279,7 @@
   };
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
   .datavue {
     padding: 0 15px 51px 35px;
   }
