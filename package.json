@@ -1,6 +1,6 @@
 {
   "name": "datavue",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "./dist/datavue.common.js",
   "files": [
     "dist/*",
@@ -9,13 +9,13 @@
     "*.js"
   ],
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve ./src/demo.js",
     "build": "vue-cli-service build --target lib --name datavue ./src/main.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "core-js": "^2.6.5",
-    "lodash": "^4.17.15",
+    "lodash-es": "^4.17.15",
     "preferred": "^0.2.7",
     "vue": "^2.6.10"
   },

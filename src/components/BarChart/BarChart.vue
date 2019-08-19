@@ -28,9 +28,9 @@
           <rect
             v-for="(point, pidx) in serie"
             :key="labels[pidx]"
-            :class="['datavue-bar', {hover: point.hover}]"
+            :class="['datavue-bar', {hover: point.hover}, `datavue-serie-${sidx + 1}`]"
             :x="point.canvasX"
-            :width="xWidth"
+            :width="barWidth"
             :y="point.canvasBase"
             :height="point.canvasHeight"
             @mouseover="highlight(point)"
@@ -70,16 +70,25 @@
             <slot name="label" :label="tooltip.label">{{ tooltip.label.label }}</slot>
           </div>
           <div class="datavue-tooltip-body">
+              {{ tooltip.serie }}:
             <slot name="value" :value="tooltip.value">{{ tooltip.value }}</slot>
           </div>
         </div>
+      </div>
+      <div class="datavue-legend">
+          <div
+              v-for="(serie, sidx) in series"
+              :key="sidx"
+              :class="[`datavue-serie-${sidx + 1}`]"
+          >{{ serie.name }}</div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import _ from 'lodash';
+  import { isArray, mergeWith, max, min } from 'lodash-es';
+  // import isArray from 'lodash-es/isArray'
   import preferred from 'preferred';
 
   export default {
@@ -97,6 +106,7 @@
           aspect: 1.5,
           xAxis: {
             gap: 0.5,
+            barGap: 0.25,
             maxTicks: 6,
             skipTicks: 0
           },
@@ -111,12 +121,12 @@
     computed: {
       mergedOptions () {
         function customizer (objValue, srcValue) {
-          if (_.isArray(srcValue)) {
+          if (isArray(srcValue)) {
             return srcValue;
           }
         }
 
-        return _.mergeWith({}, this.defaultOptions, this.options, customizer);
+        return mergeWith({}, this.defaultOptions, this.options, customizer);
       },
       preferredSeq () {
         return preferred.sequence(
@@ -131,14 +141,21 @@
       xDist () {
         return (1 + this.mergedOptions.xAxis.gap) * this.xWidth;
       },
+      barWidth () {
+        const n = this.series.length;
+        return this.xWidth / (n + (n - 1) * this.mergedOptions.xAxis.barGap);
+      },
+      barDist () {
+        return (1 + this.mergedOptions.xAxis.barGap) * this.barWidth;
+      },
       canvasHeight () {
         return 100 / this.mergedOptions.aspect;
       },
       dataMax () {
-        return _.max(this.series.map(s => _.max(s.data)));
+        return max(this.series.map(s => max(s.data)));
       },
       dataMin () {
-        return _.min(this.series.map(s => _.min(s.data)));
+        return min(this.series.map(s => min(s.data)));
       },
       yMax () {
         return Math.max(0, this.dataMax);
@@ -201,7 +218,7 @@
               sidx,
               pidx,
               hover: hoverSidx === sidx && hoverPidx === pidx,
-              canvasX: pidx * this.xDist,
+              canvasX: pidx * this.xDist + sidx * this.barDist,
               canvasHeight: this.scaleYToCanvas(Math.abs(value)),
               canvasBase: this.translateYToCanvas(Math.max(value, 0))
             };
@@ -216,6 +233,7 @@
           return null;
         }
         const { sidx, pidx } = this.selectedTooltip;
+        const serie = this.series[sidx].name;
         const point = this.displaySeries[sidx][pidx];
         const label = this.labels[point.pidx];
         const align = point.canvasX > 50 ? 'right' : 'left';
@@ -223,6 +241,7 @@
           align,
           left: point.canvasX + (align === 'right' ? this.xWidth : 0),
           label: { label, i: point.pidx },
+          serie,
           value: point.value,
           top: this.translateYToUnit(Math.max(point.value, 0)) * 100
         };
@@ -262,7 +281,7 @@
 
 <style scoped lang="scss">
   .datavue {
-    padding: 0 15px 18px 35px;
+    padding: 0 15px 51px 35px;
   }
 
   .datavue-title {
@@ -283,13 +302,42 @@
   }
 
   .datavue-bar {
-    fill: #3490DC;
     opacity: 0.7;
     filter: drop-shadow(0px 0px 0.5px rgba(0, 0, 0, .7));
 
     &.hover {
       opacity: 1.0;
     }
+  }
+
+  .datavue-serie-1 {
+    fill: #3490DC;
+    background-color: #3490DC;
+  }
+
+  .datavue-serie-2 {
+    fill: #42c17c;
+      background-color: #42c17c;
+  }
+
+  .datavue-serie-3 {
+    fill: #c4aa42;
+      background-color: #c4aa42;
+  }
+
+  .datavue-serie-4 {
+    fill: #c45c40;
+      background-color: #c45c40;
+  }
+
+  .datavue-serie-5 {
+    fill: #c46287;
+      background-color: #c46287;
+  }
+
+  .datavue-serie-6 {
+    fill: #9163c4;
+      background-color: #9163c4;
   }
 
   .datavue-labels {
@@ -366,5 +414,22 @@
 
   .datavue-tooltip-body {
     padding: 5px;
+  }
+
+  .datavue-legend {
+      font-size: 0.9em;
+      position: absolute;
+      left: -35px;
+      right: -15px;
+      margin-top: 2em;
+
+      &>div {
+          padding: 2px 10px;
+          color: white;
+          border-radius: 5px;
+          text-align: center;
+          float: left;
+          margin-right: 10px;
+      }
   }
 </style>
