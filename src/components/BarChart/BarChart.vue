@@ -414,6 +414,7 @@
 
   .datavue-tooltip-body {
     padding: 5px;
+    white-space: nowrap;
   }
 
   .datavue-legend {
