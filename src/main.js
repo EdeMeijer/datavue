@@ -1,8 +1,18 @@
-import Vue from 'vue';
-import Demo from './Demo.vue';
+import * as components from './components';
+export * from './components';
 
-Vue.config.productionTip = false;
+const ComponentLibrary = {
+    install (Vue, options = {}) {
+        // components
+        for (const componentName in components) {
+            const component = components[componentName];
+            Vue.component(component.name, component);
+        }
+    }
+};
 
-new Vue({
-  render: h => h(Demo)
-}).$mount('#demo');
+export default ComponentLibrary;
+
+if (typeof window !== 'undefined' && window.Vue) {
+    window.Vue.use(ComponentLibrary);
+}

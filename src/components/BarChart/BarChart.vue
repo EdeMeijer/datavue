@@ -83,6 +83,7 @@
   import preferred from 'preferred';
 
   export default {
+    name: 'BarChart',
     props: {
       title: { type: String, required: true },
       labels: { type: Array, required: true },

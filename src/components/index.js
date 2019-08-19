@@ -1,3 +1,1 @@
-import BarChart from './BarChart.vue';
-
-export { BarChart };
+export { default as BarChart } from './BarChart';
