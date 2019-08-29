@@ -70,24 +70,25 @@
             <slot name="label" :label="tooltip.label">{{ tooltip.label.label }}</slot>
           </div>
           <div class="datavue-tooltip-body">
-              {{ tooltip.serie }}:
+            {{ tooltip.serie }}:
             <slot name="value" :value="tooltip.value">{{ tooltip.value }}</slot>
           </div>
         </div>
       </div>
       <div class="datavue-legend">
-          <div
-              v-for="(serie, sidx) in series"
-              :key="sidx"
-              :class="[`datavue-serie-${sidx + 1}`]"
-          >{{ serie.name }}</div>
+        <div
+          v-for="(serie, sidx) in series"
+          :key="sidx"
+          :class="[`datavue-serie-${sidx + 1}`]"
+        >{{ serie.name }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import { isArray, mergeWith, max, min } from 'lodash-es';
+  import { isArray, max, mergeWith, min } from 'lodash-es';
   // import isArray from 'lodash-es/isArray'
   import preferred from 'preferred';
 
@@ -312,32 +313,32 @@
 
   .datavue-serie-1 {
     fill: #3490DC;
-    background-color: #3490DC;
+    background-color: #23679f;
   }
 
   .datavue-serie-2 {
     fill: #42c17c;
-      background-color: #42c17c;
+    background-color: #298a55;
   }
 
   .datavue-serie-3 {
     fill: #c4aa42;
-      background-color: #c4aa42;
+    background-color: #9d8832;
   }
 
   .datavue-serie-4 {
     fill: #c45c40;
-      background-color: #c45c40;
+    background-color: #b95337;
   }
 
   .datavue-serie-5 {
     fill: #c46287;
-      background-color: #c46287;
+    background-color: #aa5273;
   }
 
   .datavue-serie-6 {
     fill: #9163c4;
-      background-color: #9163c4;
+    background-color: #7b4eac;
   }
 
   .datavue-labels {
@@ -418,19 +419,20 @@
   }
 
   .datavue-legend {
-      font-size: 0.9em;
-      position: absolute;
-      left: -35px;
-      right: -15px;
-      margin-top: 2em;
+    font-size: 0.9em;
+    position: absolute;
+    left: -35px;
+    right: -15px;
+    margin-top: 2em;
+    opacity: 0.65;
 
-      &>div {
-          padding: 2px 10px;
-          color: white;
-          border-radius: 5px;
-          text-align: center;
-          float: left;
-          margin-right: 10px;
-      }
+    & > div {
+      padding: 2px 10px;
+      color: white;
+      border-radius: 5px;
+      text-align: center;
+      float: left;
+      margin-right: 10px;
+    }
   }
 </style>
