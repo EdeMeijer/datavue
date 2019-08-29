@@ -1,6 +1,6 @@
 {
   "name": "datavue",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "main": "./dist/datavue.common.js",
   "files": [
     "dist/*",

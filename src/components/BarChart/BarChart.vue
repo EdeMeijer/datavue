@@ -239,7 +239,7 @@
         const align = point.canvasX > 50 ? 'right' : 'left';
         return {
           align,
-          left: point.canvasX + (align === 'right' ? this.xWidth : 0),
+          left: point.canvasX + (align === 'right' ? this.barWidth : 0),
           label: { label, i: point.pidx },
           serie,
           value: point.value,

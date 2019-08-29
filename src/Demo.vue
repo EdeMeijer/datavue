@@ -22,15 +22,15 @@
                 labels: ['a', 'b', 'c', 'd', 'e', 'f'],
                 series: [
                     {
-                        name: 'Foo',
+                        name: 'Total foo',
                         data: [5, 2, 8, 14, 2, 6]
                     },
                     {
-                        name: 'Bar',
+                        name: 'Total bar',
                         data: [1, 7, 1, null, -3, -1]
                     },
                     {
-                        name: 'Qux',
+                        name: 'Total qux',
                         data: [1, 3, null, 4, 8, null]
                     }
                 ]
