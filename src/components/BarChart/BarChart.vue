@@ -427,7 +427,8 @@
     opacity: 0.65;
 
     & > div {
-      padding: 2px 10px;
+      line-height: 0.9em;
+      padding: 4px 10px 2px 10px;
       color: white;
       border-radius: 5px;
       text-align: center;
