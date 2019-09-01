@@ -91,11 +91,12 @@
   import Scale from '../../Scale';
   import Bar from '../partials/Bar';
   import BarGroup from '../partials/BarGroup';
+  import chartMixin from '../mixins/chartMixin';
 
   export default {
     name: 'stacked-bar-chart',
     components: { BarGroup, Bar, Tooltip, Legend },
-    mixins: [optionsMixin],
+    mixins: [chartMixin, optionsMixin],
     props: {
       title: { type: String, required: true },
       labels: { type: Array, required: true },
@@ -103,9 +104,7 @@
     },
     data () {
       return {
-        selectedTooltip: null,
         defaultOptions: {
-          aspect: 1.5,
           xAxis: {
             gap: 0.5,
             maxTicks: 6,
@@ -315,12 +314,6 @@
           next += spacing;
         }
         return result;
-      },
-      highlight (point) {
-        this.$data.selectedTooltip = { sidx: point.sidx, pidx: point.pidx };
-      },
-      unhighlight () {
-        this.$data.selectedTooltip = null;
       }
     }
   };

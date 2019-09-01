@@ -19,7 +19,6 @@
     },
     computed: {
       yNorm () {
-        console.log(JSON.stringify(this.group));
         if (this.group.canvasHeight < 0) {
           return this.group.canvasY + this.group.canvasHeight;
         }

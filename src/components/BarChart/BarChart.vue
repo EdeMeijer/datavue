@@ -85,11 +85,12 @@
   import Tooltip from '../partials/Tooltip';
   import Scale from '../../Scale';
   import Bar from '../partials/Bar';
+  import chartMixin from '../mixins/chartMixin';
 
   export default {
     name: 'bar-chart',
     components: { Bar, Tooltip, Legend },
-    mixins: [optionsMixin],
+    mixins: [chartMixin, optionsMixin],
     props: {
       title: { type: String, required: true },
       labels: { type: Array, required: true },
@@ -97,9 +98,7 @@
     },
     data () {
       return {
-        selectedTooltip: null,
         defaultOptions: {
-          aspect: 1.5,
           xAxis: {
             gap: 0.5,
             barGap: 0.25,
@@ -287,12 +286,6 @@
           next += spacing;
         }
         return result;
-      },
-      highlight (point) {
-        this.$data.selectedTooltip = { sidx: point.sidx, pidx: point.pidx };
-      },
-      unhighlight () {
-        this.$data.selectedTooltip = null;
       }
     }
   };
