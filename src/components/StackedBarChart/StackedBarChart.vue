@@ -3,27 +3,8 @@
     <span class="datavue-title">{{ title }}</span>
     <div class="datavue-wrapper">
       <svg style="vertical-align:top;" :viewBox="viewBox">
-        <g class="datavue-grid">
-          <line
-            v-for="label in displayLabels"
-            :key="label.label"
-            class="datavue-grid-y"
-            :x1="label.canvasX"
-            :y1="0"
-            :x2="label.canvasX"
-            :y2="canvasHeight"
-          ></line>
-
-          <line
-            v-for="(yTick, index) in displayYTicks"
-            :key="index"
-            class="datavue-grid-x"
-            :x1="0"
-            :y1="yTick.canvasValue"
-            :x2="100"
-            :y2="yTick.canvasValue"
-          ></line>
-        </g>
+        <YGrid :displayYTicks="displayYTicks"/>
+        <CategoricalXGrid :displayLabels="displayLabels" :canvasHeight="canvasHeight"/>
 
         <BarGroup
           v-for="(group, pidx) in displayData"
@@ -81,10 +62,12 @@
   import YTicks from '../partials/YTicks';
   import Labels from '../partials/Labels';
   import categoricalXAxisMixin from '../mixins/categoricalXAxisMixin';
+  import YGrid from '../partials/YGrid';
+  import CategoricalXGrid from '../partials/CategoricalXGrid';
 
   export default {
     name: 'stacked-bar-chart',
-    components: { Labels, YTicks, BarGroup, Bar, Tooltip, Legend },
+    components: { CategoricalXGrid, YGrid, Labels, YTicks, BarGroup, Bar, Tooltip, Legend },
     mixins: [chartMixin, yAxisMixin, categoricalXAxisMixin],
     data () {
       return {
