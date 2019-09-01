@@ -24,20 +24,22 @@
             :y2="yTick.canvasValue"
           ></line>
         </g>
+
         <g class="datavue-series" v-for="(serie, sidx) in this.displaySeries" :key="sidx">
-          <rect
+          <Bar
             v-for="(point, pidx) in serie"
             :key="labels[pidx]"
-            :class="['datavue-bar', {hover: point.hover}, `datavue-serie-${sidx + 1}`]"
+            :sidx="sidx"
             :x="point.canvasX"
             :width="barWidth"
-            :y="point.canvasBase"
+            :y="point.canvasY"
             :height="point.canvasHeight"
-            @mouseover="highlight(point)"
-            @mouseout="unhighlight()"
-          ></rect>
+            @mouseover.native="highlight(point)"
+            @mouseout.native="unhighlight()"
+          />
         </g>
       </svg>
+
       <div class="datavue-labels">
         <span
           v-for="label in displayXTicks"
@@ -49,56 +51,49 @@
           </span>
         </span>
       </div>
+
       <div class="datavue-y-ticks">
         <span
           v-for="(tick, index) in displayYTicks"
           :key="index"
-          :style="{top: `${tick.unitValue * 100}%`}"
+          :style="{top: `${tick.percentValue}%`}"
         >
           <span>
             <slot name="value" :value="tick.value">{{ tick.value }}</slot>
           </span>
         </span>
       </div>
-      <div
-        v-if="tooltip"
-        class="datavue-tooltip-wrapper"
-        :style="{left: `${tooltip.left}%`, top: `${tooltip.top}%`}"
-      >
-        <div :class="['datavue-tooltip', `datavue-align-${tooltip.align}`]">
-          <div class="datavue-tooltip-header">
-            <slot name="label" :label="tooltip.label">{{ tooltip.label.label }}</slot>
-          </div>
-          <div class="datavue-tooltip-body">
-            {{ tooltip.serie }}:
-            <slot name="value" :value="tooltip.value">{{ tooltip.value }}</slot>
-          </div>
-        </div>
-      </div>
-      <div class="datavue-legend">
-        <div
-          v-for="(serie, sidx) in series"
-          :key="sidx"
-          :class="[`datavue-serie-${sidx + 1}`]"
-        >{{ serie.name }}
-        </div>
-      </div>
+
+      <Tooltip :tooltip="tooltip">
+        <template v-slot:value="{ value }">
+          <slot name="value" :value="value">{{ value }}</slot>
+        </template>
+        <template v-slot:label="{ label }">
+          <slot name="label" :label="label">{{ label.label }}</slot>
+        </template>
+      </Tooltip>
+      <Legend :series="series"/>
     </div>
   </div>
 </template>
 
 <script>
-  import { isArray, max, mergeWith, min } from 'lodash-es';
-  // import isArray from 'lodash-es/isArray'
+  import { max, min } from 'lodash-es';
   import preferred from 'preferred';
+  import optionsMixin from '../mixins/optionsMixin';
+  import Legend from '../partials/Legend';
+  import Tooltip from '../partials/Tooltip';
+  import Scale from '../../Scale';
+  import Bar from '../partials/Bar';
 
   export default {
     name: 'BarChart',
+    components: { Bar, Tooltip, Legend },
+    mixins: [optionsMixin],
     props: {
       title: { type: String, required: true },
       labels: { type: Array, required: true },
-      series: { type: Array, required: true },
-      options: { type: Object, default: () => ({}) }
+      series: { type: Array, required: true }
     },
     data () {
       return {
@@ -120,15 +115,6 @@
       };
     },
     computed: {
-      mergedOptions () {
-        function customizer (objValue, srcValue) {
-          if (isArray(srcValue)) {
-            return srcValue;
-          }
-        }
-
-        return mergeWith({}, this.defaultOptions, this.options, customizer);
-      },
       preferredSeq () {
         return preferred.sequence(
           this.mergedOptions.yAxis.preferredNumbers,
@@ -167,6 +153,12 @@
       yRange () {
         return this.yMax - this.yMin;
       },
+      yScaleCanvas () {
+        return new Scale(this.yMin, this.yMax, this.canvasHeight, 0);
+      },
+      yScalePercent () {
+        return new Scale(this.yMin, this.yMax, 100, 0);
+      },
       effectiveSkipLabels () {
         const maxLabels = this.mergedOptions.xAxis.maxTicks;
         const skipLabels = this.mergedOptions.xAxis.skipTicks;
@@ -204,8 +196,8 @@
         return this.yTicks.map(value => {
           return {
             value,
-            unitValue: this.translateYToUnit(value),
-            canvasValue: this.translateYToCanvas(value)
+            percentValue: this.yScalePercent.projectForward(value),
+            canvasValue: this.yScaleCanvas.projectForward(value)
           };
         });
       },
@@ -220,8 +212,8 @@
               pidx,
               hover: hoverSidx === sidx && hoverPidx === pidx,
               canvasX: pidx * this.xDist + sidx * this.barDist,
-              canvasHeight: this.scaleYToCanvas(Math.abs(value)),
-              canvasBase: this.translateYToCanvas(Math.max(value, 0))
+              canvasHeight: this.yScaleCanvas.scaleForward(value),
+              canvasY: this.yScaleCanvas.projectForward(0)
             };
           });
         });
@@ -244,23 +236,11 @@
           label: { label, i: point.pidx },
           serie,
           value: point.value,
-          top: this.translateYToUnit(Math.max(point.value, 0)) * 100
+          top: this.yScalePercent.projectForward(Math.max(point.value, 0))
         };
       }
     },
     methods: {
-      translateYToUnit (value) {
-        return 1.0 - this.scaleYToUnit(value - this.yMin);
-      },
-      translateYToCanvas (value) {
-        return this.translateYToUnit(value) * this.canvasHeight;
-      },
-      scaleYToUnit (value) {
-        return value / this.yRange;
-      },
-      scaleYToCanvas (value) {
-        return this.scaleYToUnit(value) * this.canvasHeight;
-      },
       getYTicksForSpacing (spacing) {
         const result = [];
         let next = Math.ceil(this.yMin / spacing) * spacing;
@@ -300,15 +280,6 @@
   .datavue-grid line {
     stroke: rgba(0, 0, 0, 0.5);
     stroke-width: 0.15
-  }
-
-  .datavue-bar {
-    opacity: 0.7;
-    filter: drop-shadow(0px 0px 0.5px rgba(0, 0, 0, .7));
-
-    &.hover {
-      opacity: 1.0;
-    }
   }
 
   .datavue-serie-1 {
@@ -378,62 +349,6 @@
         padding-right: 10px;
         white-space: nowrap;
       }
-    }
-  }
-
-  .datavue-tooltip-wrapper {
-    position: absolute;
-    z-index: 1000;
-  }
-
-  .datavue-tooltip {
-    font-size: 0.9em;
-    background-color: white;
-    border-radius: .25rem;
-    position: absolute;
-    bottom: 0;
-    margin-bottom: 10px;
-    overflow: hidden;
-    box-shadow: 0 0 5px black;
-    text-align: center;
-
-    &.datavue-align-left {
-      left: 0;
-    }
-
-    &.datavue-align-right {
-      right: 0;
-    }
-  }
-
-  .datavue-tooltip-header {
-    padding: 5px;
-    background-color: #CCC;
-    font-weight: bold;
-    white-space: nowrap;
-  }
-
-  .datavue-tooltip-body {
-    padding: 5px;
-    white-space: nowrap;
-  }
-
-  .datavue-legend {
-    font-size: 0.9em;
-    position: absolute;
-    left: -35px;
-    right: -15px;
-    margin-top: 2em;
-    opacity: 0.65;
-
-    & > div {
-      line-height: 0.9em;
-      padding: 4px 10px 2px 10px;
-      color: white;
-      border-radius: 5px;
-      text-align: center;
-      float: left;
-      margin-right: 10px;
     }
   }
 </style>
