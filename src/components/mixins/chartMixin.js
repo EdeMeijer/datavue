@@ -15,6 +15,9 @@ export default {
     };
   },
   computed: {
+    canvasHeight () {
+      return 100 / this.mergedOptions.aspect;
+    },
     viewBox () {
       return `0 0 100 ${this.canvasHeight}`;
     }

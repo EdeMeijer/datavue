@@ -74,21 +74,18 @@
   import { max, min } from 'lodash-es';
   import Legend from '../partials/Legend';
   import Tooltip from '../partials/Tooltip';
-  import Scale from '../../Scale';
   import Bar from '../partials/Bar';
   import BarGroup from '../partials/BarGroup';
   import chartMixin from '../mixins/chartMixin';
   import yAxisMixin from '../mixins/yAxisMixin';
   import YTicks from '../partials/YTicks';
   import Labels from '../partials/Labels';
+  import categoricalXAxisMixin from '../mixins/categoricalXAxisMixin';
 
   export default {
     name: 'stacked-bar-chart',
     components: { Labels, YTicks, BarGroup, Bar, Tooltip, Legend },
-    mixins: [chartMixin, yAxisMixin],
-    props: {
-      labels: { type: Array, required: true }
-    },
+    mixins: [chartMixin, yAxisMixin, categoricalXAxisMixin],
     data () {
       return {
         defaultOptions: {
@@ -102,60 +99,11 @@
       };
     },
     computed: {
-      xGap () {
-        return this.mergedOptions.xAxis.gap;
-      },
-      xMin () {
-        return 0;
-      },
-      xMax () {
-        const n = this.labels.length;
-        return n + (n - 1) * this.xGap;
-      },
-      xPadding () {
-        return (this.xMax - this.xMin) * this.mergedOptions.xAxis.margin;
-      },
-      xMaxPadded () {
-        return this.xMax + this.xPadding;
-      },
-      xMinPadded () {
-        return this.xMin - this.xPadding;
-      },
-      xScale () {
-        return new Scale(this.xMinPadded, this.xMaxPadded, 0, 100);
-      },
-      xWidth () {
-        return this.xScale.scale(1);
-      },
-      canvasHeight () {
-        return 100 / this.mergedOptions.aspect;
-      },
       dataMax () {
         return max(this.groupedData.map(g => max(g.points.map(p => p.accumValue))));
       },
       dataMin () {
         return min(this.groupedData.map(g => min(g.points.map(p => p.accumValue))));
-      },
-      effectiveSkipLabels () {
-        const maxLabels = this.mergedOptions.xAxis.maxTicks;
-        const skipLabels = this.mergedOptions.xAxis.skipTicks;
-        if (maxLabels === null) {
-          return skipLabels;
-        }
-        const skip = Math.ceil(this.labels.length / maxLabels) - 1;
-        return Math.max(skip, skipLabels);
-      },
-      displayLabels () {
-        return this.labels
-          .map((label, i) => ({ label, i }))
-          .filter(({ i }) => i % (this.effectiveSkipLabels + 1) === 0)
-          .map(({ label, i }) => {
-            return {
-              label,
-              i,
-              canvasX: this.xScale.project(i * (1 + this.xGap) + 0.5)
-            };
-          });
       },
       groupedData () {
         const accumPos = this.labels.map(() => 0.0);
