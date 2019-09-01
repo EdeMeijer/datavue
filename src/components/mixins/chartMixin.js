@@ -1,4 +1,8 @@
 export default {
+  props: {
+    title: { type: String, required: true },
+    series: { type: Array, required: true }
+  },
   data () {
     return {
       selectedTooltip: null,

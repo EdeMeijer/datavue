@@ -92,9 +92,7 @@
     components: { Bar, Tooltip, Legend },
     mixins: [chartMixin, optionsMixin],
     props: {
-      title: { type: String, required: true },
-      labels: { type: Array, required: true },
-      series: { type: Array, required: true }
+      labels: { type: Array, required: true }
     },
     data () {
       return {
