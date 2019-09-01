@@ -12,6 +12,10 @@
 
 .datavue-wrapper {
   position: relative;
+
+  svg {
+    vertical-align:top;
+  }
 }
 
 .datavue-grid line {

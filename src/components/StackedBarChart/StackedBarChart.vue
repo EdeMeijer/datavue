@@ -1,6 +1,6 @@
 <template>
   <DataVue :title="title">
-    <svg style="vertical-align:top;" :viewBox="viewBox">
+    <svg :viewBox="viewBox">
       <YGrid :displayYTicks="displayYTicks"/>
       <CategoricalXGrid :displayLabels="displayLabels" :canvasHeight="canvasHeight"/>
 
