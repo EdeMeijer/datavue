@@ -1,0 +1,50 @@
+.datavue {
+  padding: 0 15px 51px 35px;
+}
+
+.datavue-title {
+  display: block;
+  text-align: center;
+  margin: 10px 0;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.datavue-wrapper {
+  position: relative;
+}
+
+.datavue-grid line {
+  stroke: rgba(0, 0, 0, 0.5);
+  stroke-width: 0.15
+}
+
+.datavue-serie-1 {
+  fill: #3490DC;
+  background-color: #23679f;
+}
+
+.datavue-serie-2 {
+  fill: #42c17c;
+  background-color: #298a55;
+}
+
+.datavue-serie-3 {
+  fill: #c4aa42;
+  background-color: #9d8832;
+}
+
+.datavue-serie-4 {
+  fill: #c45c40;
+  background-color: #b95337;
+}
+
+.datavue-serie-5 {
+  fill: #c46287;
+  background-color: #aa5273;
+}
+
+.datavue-serie-6 {
+  fill: #9163c4;
+  background-color: #7b4eac;
+}

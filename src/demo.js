@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Demo from './Demo';
+import '@/assets/global.scss';
 
 Vue.config.productionTip = false;
 
