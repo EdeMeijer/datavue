@@ -25,19 +25,24 @@
           ></line>
         </g>
 
-        <g class="datavue-series" v-for="(serie, sidx) in this.displaySeries" :key="sidx">
+        <BarGroup
+          v-for="(group, pidx) in displayData"
+          :key="labels[pidx]"
+          :group="group"
+          :width="xWidth"
+        >
           <Bar
-            v-for="(point, pidx) in serie"
-            :key="labels[pidx]"
+            v-for="(point, sidx) in group.points"
+            :key="sidx"
             :sidx="sidx"
-            :x="point.canvasX"
-            :width="barWidth"
+            :x="group.canvasX"
+            :width="xWidth"
             :y="point.canvasY"
             :height="point.canvasHeight"
             @mouseover.native="highlight(point)"
             @mouseout.native="unhighlight()"
           />
-        </g>
+        </BarGroup>
       </svg>
 
       <div class="datavue-labels">
@@ -85,10 +90,11 @@
   import Tooltip from '../partials/Tooltip';
   import Scale from '../../Scale';
   import Bar from '../partials/Bar';
+  import BarGroup from '../partials/BarGroup';
 
   export default {
-    name: 'bar-chart',
-    components: { Bar, Tooltip, Legend },
+    name: 'stacked-bar-chart',
+    components: { BarGroup, Bar, Tooltip, Legend },
     mixins: [optionsMixin],
     props: {
       title: { type: String, required: true },
@@ -102,7 +108,6 @@
           aspect: 1.5,
           xAxis: {
             gap: 0.5,
-            barGap: 0.25,
             maxTicks: 6,
             skipTicks: 0,
             margin: 0.01
@@ -122,16 +127,6 @@
           this.mergedOptions.yAxis.preferredNumbers,
           this.mergedOptions.yAxis.preferredNumberBase
         );
-      },
-      xSubGap () {
-        return this.mergedOptions.xAxis.barGap;
-      },
-      xSubMax () {
-        const n = this.series.length;
-        return n + (n - 1) * this.xSubGap;
-      },
-      xSubScale () {
-        return new Scale(0, this.xSubMax, 0, 1);
       },
       xGap () {
         return this.mergedOptions.xAxis.gap;
@@ -158,17 +153,14 @@
       xWidth () {
         return this.xScale.scale(1);
       },
-      barWidth () {
-        return this.xScale.scale(this.xSubScale.scale(1));
-      },
       canvasHeight () {
         return 100 / this.mergedOptions.aspect;
       },
       dataMax () {
-        return max(this.series.map(s => max(s.data)));
+        return max(this.groupedData.map(g => max(g.points.map(p => p.accumValue))));
       },
       dataMin () {
-        return min(this.series.map(s => min(s.data)));
+        return min(this.groupedData.map(g => min(g.points.map(p => p.accumValue))));
       },
       yMax () {
         return Math.max(0, this.dataMax);
@@ -239,21 +231,55 @@
           };
         });
       },
-      displaySeries () {
+      groupedData () {
+        const accumPos = this.labels.map(() => 0.0);
+        const accumNeg = this.labels.map(() => 0.0);
+
+        const groups = this.labels.map(() => ({
+          min: 0,
+          max: 0,
+          points: []
+        }));
+
+        this.series.forEach((serie) => {
+          serie.data.forEach((value, pidx) => {
+            const accum = value >= 0.0 ? accumPos : accumNeg;
+            const base = accum[pidx];
+            accum[pidx] += value;
+            const accumValue = accum[pidx];
+            const group = groups[pidx];
+
+            group.min = Math.min(group.min, accumValue);
+            group.max = Math.max(group.max, accumValue);
+            group.points.push({ value, base, accumValue });
+          });
+        });
+
+        return groups;
+      },
+      displayData () {
         const { sidx: hoverSidx = null, pidx: hoverPidx = null } = (this.selectedTooltip || {});
 
-        return this.series.map((serie, sidx) => {
-          return serie.data.map((value, pidx) => {
-            return {
-              value,
-              sidx,
-              pidx,
-              hover: hoverSidx === sidx && hoverPidx === pidx,
-              canvasX: this.xScale.project(pidx * (1 + this.xGap) + this.xSubScale.project(sidx * (1 + this.xSubGap))),
-              canvasHeight: this.yScaleCanvas.scale(value),
-              canvasY: this.yScaleCanvas.project(0)
-            };
-          });
+        return this.groupedData.map(({ min, max, points }, pidx) => {
+          return {
+            canvasX: this.xScale.project(pidx * (1 + this.xGap)),
+            min,
+            max,
+            canvasHeight: this.yScaleCanvas.scale(max - min),
+            canvasY: this.yScaleCanvas.project(min),
+            points: points.map(({ value, base, accumValue }, sidx) => {
+              return {
+                value,
+                base,
+                accumValue,
+                sidx,
+                pidx,
+                hover: hoverSidx === sidx && hoverPidx === pidx,
+                canvasHeight: this.yScaleCanvas.scale(value),
+                canvasY: this.yScaleCanvas.project(base)
+              };
+            })
+          };
         });
       },
       viewBox () {
@@ -265,16 +291,18 @@
         }
         const { sidx, pidx } = this.selectedTooltip;
         const serie = this.series[sidx].name;
-        const point = this.displaySeries[sidx][pidx];
-        const label = this.labels[point.pidx];
-        const align = point.canvasX > 50 ? 'right' : 'left';
+        const group = this.displayData[pidx];
+        const point = group.points[sidx];
+        const label = this.labels[pidx];
+        const align = group.canvasX > 50 ? 'right' : 'left';
+
         return {
           align,
-          left: point.canvasX + (align === 'right' ? this.barWidth : 0),
+          left: group.canvasX + (align === 'right' ? this.xWidth : 0),
           label: { label, i: point.pidx },
           serie,
           value: point.value,
-          top: this.yScalePercent.project(Math.max(point.value, 0))
+          top: this.yScalePercent.project(Math.max(point.accumValue, point.base, 0))
         };
       }
     },

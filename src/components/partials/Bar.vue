@@ -35,7 +35,11 @@
 <style lang="scss">
   .datavue-bar {
     opacity: 0.7;
-    filter: drop-shadow(0px 0px 0.5px rgba(0, 0, 0, .7));
+
+    .datavue-series & {
+      stroke: rgba(0, 0, 0, 0.5);
+      stroke-width: 0.25;
+    }
 
     &.hover {
       opacity: 1.0;

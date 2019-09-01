@@ -1,7 +1,7 @@
 <template>
     <div id="demo">
-        <div id="wrapper">
-            <BarChart title="Demo chart" :labels="labels" :series="series">
+        <div class="wrapper">
+            <BarChart title="Demo bar chart" :labels="labels" :series="series">
                 <template v-slot:value="{ value }">
                     {{ value }}%
                 </template>
@@ -10,13 +10,25 @@
                 </template>
             </BarChart>
         </div>
+        <div class="wrapper">
+            <StackedBarChart title="Demo stacked bar chart" :labels="labels" :series="series">
+                <template v-slot:value="{ value }">
+                    {{ value }}%
+                </template>
+                <template v-slot:label="{ label }">
+                    custom {{ label.label }}
+                </template>
+            </StackedBarChart>
+        </div>
     </div>
 </template>
 
 <script>
     import BarChart from './components/BarChart';
+    import StackedBarChart from './components/StackedBarChart/StackedBarChart';
+
     export default {
-        components: { BarChart },
+        components: { StackedBarChart, BarChart },
         data () {
             return {
                 labels: ['a', 'b', 'c', 'd', 'e', 'f'],
@@ -40,7 +52,7 @@
 </script>
 
 <style>
-    #wrapper {
+    .wrapper {
         width: 500px;
         margin: 100px auto;
         background-color: #EEE;

@@ -14,19 +14,11 @@ export default class Scale {
     this.outputRange = max - min;
   }
 
-  scaleForward (value) {
+  scale (value) {
     return (value / this.inputRange) * this.outputRange;
   }
 
-  scaleBackward (value) {
-    return (value / this.outputRange) * this.inputRange;
-  }
-
-  projectForward (value) {
-    return this.scaleForward(value - this.inputMin) + this.outputMin;
-  }
-
-  projectBackward (value) {
-    return this.scaleBackward(value - this.outputMin) + this.inputMin;
+  project (value) {
+    return this.scale(value - this.inputMin) + this.outputMin;
   }
 }
