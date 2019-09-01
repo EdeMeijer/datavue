@@ -5,7 +5,7 @@
       <svg style="vertical-align:top;" :viewBox="viewBox">
         <g class="datavue-grid">
           <line
-            v-for="label in displayXTicks"
+            v-for="label in displayLabels"
             :key="label.label"
             class="datavue-grid-y"
             :x1="label.canvasX"
@@ -46,18 +46,11 @@
         </BarGroup>
       </svg>
 
-      <div class="datavue-labels">
-        <span
-          v-for="label in displayXTicks"
-          :key="label.label"
-          :style="{left: `${label.canvasX}%`}"
-        >
-          <span>
-            <slot name="label" :label="label">{{ label.label }}</slot>
-          </span>
-        </span>
-      </div>
-
+      <Labels :displayLabels="displayLabels">
+        <template v-slot:label="{ label }">
+          <slot name="label" :label="label">{{ label.label }}</slot>
+        </template>
+      </Labels>
       <YTicks :displayYTicks="displayYTicks">
         <template v-slot:value="{ value }">
           <slot name="value" :value="value">{{ value }}</slot>
@@ -87,10 +80,11 @@
   import chartMixin from '../mixins/chartMixin';
   import yAxisMixin from '../mixins/yAxisMixin';
   import YTicks from '../partials/YTicks';
+  import Labels from '../partials/Labels';
 
   export default {
     name: 'stacked-bar-chart',
-    components: { YTicks, BarGroup, Bar, Tooltip, Legend },
+    components: { Labels, YTicks, BarGroup, Bar, Tooltip, Legend },
     mixins: [chartMixin, yAxisMixin],
     props: {
       labels: { type: Array, required: true }
@@ -151,7 +145,7 @@
         const skip = Math.ceil(this.labels.length / maxLabels) - 1;
         return Math.max(skip, skipLabels);
       },
-      displayXTicks () {
+      displayLabels () {
         return this.labels
           .map((label, i) => ({ label, i }))
           .filter(({ i }) => i % (this.effectiveSkipLabels + 1) === 0)
@@ -288,24 +282,5 @@
   .datavue-serie-6 {
     fill: #9163c4;
     background-color: #7b4eac;
-  }
-
-  .datavue-labels {
-    font-size: 0.8em;
-    position: absolute;
-    left: 0;
-    right: 0;
-
-    & > span {
-      position: absolute;
-      bottom: -20px;
-      left: 0;
-
-      & > span {
-        position: relative;
-        left: -50%;
-        white-space: nowrap;
-      }
-    }
   }
 </style>
