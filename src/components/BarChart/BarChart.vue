@@ -80,18 +80,17 @@
 
 <script>
   import { max, min } from 'lodash-es';
-  import preferred from 'preferred';
-  import optionsMixin from '../mixins/optionsMixin';
   import Legend from '../partials/Legend';
   import Tooltip from '../partials/Tooltip';
   import Scale from '../../Scale';
   import Bar from '../partials/Bar';
   import chartMixin from '../mixins/chartMixin';
+  import yAxisMixin from '../mixins/yAxisMixin';
 
   export default {
     name: 'bar-chart',
     components: { Bar, Tooltip, Legend },
-    mixins: [chartMixin, optionsMixin],
+    mixins: [chartMixin, yAxisMixin],
     props: {
       labels: { type: Array, required: true }
     },
@@ -104,23 +103,11 @@
             maxTicks: 6,
             skipTicks: 0,
             margin: 0.01
-          },
-          yAxis: {
-            maxTicks: 6,
-            preferredNumbers: [1, 2, 2.5, 4, 5],
-            preferredNumberBase: 10,
-            margin: 0.02
           }
         }
       };
     },
     computed: {
-      preferredSeq () {
-        return preferred.sequence(
-          this.mergedOptions.yAxis.preferredNumbers,
-          this.mergedOptions.yAxis.preferredNumberBase
-        );
-      },
       xSubGap () {
         return this.mergedOptions.xAxis.barGap;
       },
@@ -168,33 +155,6 @@
       dataMin () {
         return min(this.series.map(s => min(s.data)));
       },
-      yMax () {
-        return Math.max(0, this.dataMax);
-      },
-      yMin () {
-        return Math.min(0, this.dataMin);
-      },
-      yRange () {
-        return this.yMax - this.yMin;
-      },
-      yPadding () {
-        return this.yRange * this.mergedOptions.yAxis.margin;
-      },
-      yRangePadded () {
-        return this.yRange + 2 * this.yPadding;
-      },
-      yMaxPadded () {
-        return this.yMax + this.yPadding;
-      },
-      yMinPadded () {
-        return this.yMin - this.yPadding;
-      },
-      yScaleCanvas () {
-        return new Scale(this.yMinPadded, this.yMaxPadded, this.canvasHeight, 0);
-      },
-      yScalePercent () {
-        return new Scale(this.yMinPadded, this.yMaxPadded, 100, 0);
-      },
       effectiveSkipLabels () {
         const maxLabels = this.mergedOptions.xAxis.maxTicks;
         const skipLabels = this.mergedOptions.xAxis.skipTicks;
@@ -216,27 +176,6 @@
             };
           });
       },
-      yTicks () {
-        const maxYTicks = this.mergedOptions.yAxis.maxTicks;
-        const spacingBounds = this.preferredSeq.bounds(this.yRangePadded / (maxYTicks - 1));
-
-        // First try the small/floor spacing
-        const ticks = this.getYTicksForSpacing(spacingBounds.floor);
-        if (ticks.length <= maxYTicks) {
-          return ticks;
-        }
-        // Too many labels, use the bigger/ceil spacing
-        return this.getYTicksForSpacing(spacingBounds.ceil);
-      },
-      displayYTicks () {
-        return this.yTicks.map(value => {
-          return {
-            value,
-            percentValue: this.yScalePercent.project(value),
-            canvasValue: this.yScaleCanvas.project(value)
-          };
-        });
-      },
       displaySeries () {
         const { sidx: hoverSidx = null, pidx: hoverPidx = null } = (this.selectedTooltip || {});
 
@@ -253,9 +192,6 @@
             };
           });
         });
-      },
-      viewBox () {
-        return `0 0 100 ${this.canvasHeight}`;
       },
       tooltip () {
         if (this.selectedTooltip === null) {
@@ -274,17 +210,6 @@
           value: point.value,
           top: this.yScalePercent.project(Math.max(point.value, 0))
         };
-      }
-    },
-    methods: {
-      getYTicksForSpacing (spacing) {
-        const result = [];
-        let next = Math.ceil(this.yMinPadded / spacing) * spacing;
-        while (next <= this.yMaxPadded) {
-          result.push(next);
-          next += spacing;
-        }
-        return result;
       }
     }
   };
