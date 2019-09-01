@@ -39,6 +39,7 @@
             :width="xWidth"
             :y="point.canvasY"
             :height="point.canvasHeight"
+            :hover="point.hover"
             @mouseover.native="highlight(point)"
             @mouseout.native="unhighlight()"
           />
