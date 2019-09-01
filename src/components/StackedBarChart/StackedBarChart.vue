@@ -1,54 +1,52 @@
 <template>
-  <div class="datavue">
-    <span class="datavue-title">{{ title }}</span>
-    <div class="datavue-wrapper">
-      <svg style="vertical-align:top;" :viewBox="viewBox">
-        <YGrid :displayYTicks="displayYTicks"/>
-        <CategoricalXGrid :displayLabels="displayLabels" :canvasHeight="canvasHeight"/>
+  <DataVue :title="title">
+    <svg style="vertical-align:top;" :viewBox="viewBox">
+      <YGrid :displayYTicks="displayYTicks"/>
+      <CategoricalXGrid :displayLabels="displayLabels" :canvasHeight="canvasHeight"/>
 
-        <BarGroup
-          v-for="(group, pidx) in displayData"
-          :key="labels[pidx]"
-          :group="group"
+      <BarGroup
+        v-for="(group, pidx) in displayData"
+        :key="labels[pidx]"
+        :group="group"
+        :width="xWidth"
+      >
+        <Bar
+          v-for="(point, sidx) in group.points"
+          :key="sidx"
+          :sidx="sidx"
+          :x="group.canvasX"
           :width="xWidth"
-        >
-          <Bar
-            v-for="(point, sidx) in group.points"
-            :key="sidx"
-            :sidx="sidx"
-            :x="group.canvasX"
-            :width="xWidth"
-            :y="point.canvasY"
-            :height="point.canvasHeight"
-            :hover="point.hover"
-            @mouseover.native="highlight(point)"
-            @mouseout.native="unhighlight()"
-          />
-        </BarGroup>
-      </svg>
+          :y="point.canvasY"
+          :height="point.canvasHeight"
+          :hover="point.hover"
+          @mouseover.native="highlight(point)"
+          @mouseout.native="unhighlight()"
+        />
+      </BarGroup>
+    </svg>
 
-      <Labels :displayLabels="displayLabels">
-        <template v-slot:label="{ label }">
-          <slot name="label" :label="label">{{ label.label }}</slot>
-        </template>
-      </Labels>
-      <YTicks :displayYTicks="displayYTicks">
-        <template v-slot:value="{ value }">
-          <slot name="value" :value="value">{{ value }}</slot>
-        </template>
-      </YTicks>
+    <Labels :displayLabels="displayLabels">
+      <template v-slot:label="{ label }">
+        <slot name="label" :label="label">{{ label.label }}</slot>
+      </template>
+    </Labels>
+    <YTicks :displayYTicks="displayYTicks">
+      <template v-slot:value="{ value }">
+        <slot name="value" :value="value">{{ value }}</slot>
+      </template>
+    </YTicks>
 
-      <Tooltip :tooltip="tooltip">
-        <template v-slot:value="{ value }">
-          <slot name="value" :value="value">{{ value }}</slot>
-        </template>
-        <template v-slot:label="{ label }">
-          <slot name="label" :label="label">{{ label.label }}</slot>
-        </template>
-      </Tooltip>
-      <Legend :series="series"/>
-    </div>
-  </div>
+    <Tooltip :tooltip="tooltip">
+      <template v-slot:value="{ value }">
+        <slot name="value" :value="value">{{ value }}</slot>
+      </template>
+      <template v-slot:label="{ label }">
+        <slot name="label" :label="label">{{ label.label }}</slot>
+      </template>
+    </Tooltip>
+
+    <Legend :series="series"/>
+  </DataVue>
 </template>
 
 <script>
@@ -64,10 +62,11 @@
   import categoricalXAxisMixin from '../mixins/categoricalXAxisMixin';
   import YGrid from '../partials/YGrid';
   import CategoricalXGrid from '../partials/CategoricalXGrid';
+  import DataVue from '../partials/DataVue';
 
   export default {
     name: 'stacked-bar-chart',
-    components: { CategoricalXGrid, YGrid, Labels, YTicks, BarGroup, Bar, Tooltip, Legend },
+    components: { DataVue, CategoricalXGrid, YGrid, Labels, YTicks, BarGroup, Bar, Tooltip, Legend },
     mixins: [chartMixin, yAxisMixin, categoricalXAxisMixin],
     data () {
       return {
