@@ -58,17 +58,11 @@
         </span>
       </div>
 
-      <div class="datavue-y-ticks">
-        <span
-          v-for="(tick, index) in displayYTicks"
-          :key="index"
-          :style="{top: `${tick.percentValue}%`}"
-        >
-          <span>
-            <slot name="value" :value="tick.value">{{ tick.value }}</slot>
-          </span>
-        </span>
-      </div>
+      <YTicks :displayYTicks="displayYTicks">
+        <template v-slot:value="{ value }">
+          <slot name="value" :value="value">{{ value }}</slot>
+        </template>
+      </YTicks>
 
       <Tooltip :tooltip="tooltip">
         <template v-slot:value="{ value }">
@@ -92,10 +86,11 @@
   import BarGroup from '../partials/BarGroup';
   import chartMixin from '../mixins/chartMixin';
   import yAxisMixin from '../mixins/yAxisMixin';
+  import YTicks from '../partials/YTicks';
 
   export default {
     name: 'stacked-bar-chart',
-    components: { BarGroup, Bar, Tooltip, Legend },
+    components: { YTicks, BarGroup, Bar, Tooltip, Legend },
     mixins: [chartMixin, yAxisMixin],
     props: {
       labels: { type: Array, required: true }
@@ -309,27 +304,6 @@
       & > span {
         position: relative;
         left: -50%;
-        white-space: nowrap;
-      }
-    }
-  }
-
-  .datavue-y-ticks {
-    font-size: 0.8em;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-
-    & > span {
-      position: absolute;
-      left: 0;
-
-      & > span {
-        display: inline-block;
-        position: relative;
-        left: -100%;
-        top: -10px;
-        padding-right: 10px;
         white-space: nowrap;
       }
     }
