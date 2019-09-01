@@ -39,6 +39,7 @@
         <slot name="label" :label="label">{{ label.label }}</slot>
       </template>
     </Tooltip>
+
     <Legend :series="series"/>
   </DataVue>
 </template>
