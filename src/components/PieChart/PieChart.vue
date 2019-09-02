@@ -84,7 +84,7 @@
         return this.xScale.scale(1.0);
       },
       canvasRadiusY () {
-        return this.yScale.scale(1.0);
+        return Math.abs(this.yScale.scale(1.0));
       },
       slices () {
         const total = sum(this.data);
