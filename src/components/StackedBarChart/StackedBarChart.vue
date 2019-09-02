@@ -27,7 +27,7 @@
 
     <Labels :displayLabels="displayLabels">
       <template v-slot:label="{ label }">
-        <slot name="label" :label="label">{{ label.label }}</slot>
+        <slot name="label" :label="label">{{ label.name }}</slot>
       </template>
     </Labels>
     <YTicks :displayYTicks="displayYTicks">
@@ -41,7 +41,7 @@
         <slot name="value" :value="value">{{ value }}</slot>
       </template>
       <template v-slot:label="{ label }">
-        <slot name="label" :label="label">{{ label.label }}</slot>
+        <slot name="label" :label="label">{{ label.name }}</slot>
       </template>
     </Tooltip>
 
@@ -68,17 +68,8 @@
     name: 'stacked-bar-chart',
     components: { DataVue, CategoricalXGrid, YGrid, Labels, YTicks, BarGroup, Bar, Tooltip, Legend },
     mixins: [chartMixin, yAxisMixin, categoricalXAxisMixin],
-    data () {
-      return {
-        defaultOptions: {
-          xAxis: {
-            gap: 0.5,
-            maxTicks: 6,
-            skipTicks: 0,
-            margin: 0.01
-          }
-        }
-      };
+    props: {
+      series: { type: Array, required: true }
     },
     computed: {
       dataMax () {
@@ -152,7 +143,7 @@
         return {
           align,
           left: group.canvasX + (align === 'right' ? this.xWidth : 0),
-          label: { label, i: point.pidx },
+          label: { name: label, i: pidx },
           serie,
           value: point.value,
           top: this.yScalePercent.project(Math.max(point.accumValue, point.base, 0))

@@ -57,7 +57,7 @@ export default {
         .filter(({ i }) => i % (this.effectiveSkipLabels + 1) === 0)
         .map(({ label, i }) => {
           return {
-            label,
+            name: label,
             i,
             canvasX: this.xScale.project(i * (1 + this.xGap) + 0.5)
           };

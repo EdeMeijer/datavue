@@ -3,8 +3,7 @@ import optionsMixin from './optionsMixin';
 export default {
   mixins: [optionsMixin],
   props: {
-    title: { type: String, required: true },
-    series: { type: Array, required: true }
+    title: { type: String, required: true }
   },
   data () {
     return {

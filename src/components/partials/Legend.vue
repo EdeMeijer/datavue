@@ -4,7 +4,11 @@
       v-for="(serie, sidx) in series"
       :key="sidx"
       :class="[`datavue-serie-${sidx + 1}`]"
-    >{{ serie.name }}
+      :style="{'background-color': serie.color}"
+    >
+      <slot name="serie" :serie="serie">
+        {{ serie.name }}
+      </slot>
     </div>
   </div>
 </template>

@@ -22,7 +22,7 @@
 
     <Labels :displayLabels="displayLabels">
       <template v-slot:label="{ label }">
-        <slot name="label" :label="label">{{ label.label }}</slot>
+        <slot name="label" :label="label">{{ label.name }}</slot>
       </template>
     </Labels>
     <YTicks :displayYTicks="displayYTicks">
@@ -36,7 +36,7 @@
         <slot name="value" :value="value">{{ value }}</slot>
       </template>
       <template v-slot:label="{ label }">
-        <slot name="label" :label="label">{{ label.label }}</slot>
+        <slot name="label" :label="label">{{ label.name }}</slot>
       </template>
     </Tooltip>
 
@@ -63,6 +63,9 @@
     name: 'bar-chart',
     components: { DataVue, CategoricalXGrid, YGrid, Labels, YTicks, Bar, Tooltip, Legend },
     mixins: [chartMixin, yAxisMixin, categoricalXAxisMixin],
+    props: {
+      series: { type: Array, required: true }
+    },
     data () {
       return {
         defaultOptions: {
@@ -121,7 +124,7 @@
         return {
           align,
           left: point.canvasX + (align === 'right' ? this.barWidth : 0),
-          label: { label, i: point.pidx },
+          label: { name: label, i: pidx },
           serie,
           value: point.value,
           top: this.yScalePercent.project(Math.max(point.value, 0))

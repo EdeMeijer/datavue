@@ -2,11 +2,11 @@
   <div class="datavue-labels">
     <span
       v-for="label in displayLabels"
-      :key="label.label"
+      :key="label.name"
       :style="{left: `${label.canvasX}%`}"
     >
       <span>
-        <slot name="label" :label="label">{{ label.label }}</slot>
+        <slot name="label" :label="label">{{ label.name }}</slot>
       </span>
     </span>
   </div>
