@@ -1,7 +1,7 @@
 import * as components from './components';
-import '@/assets/global.scss';
 
-export * from './components';
+import '@/assets/global.scss';
+export { BarChart, StackedBarChart, PieChart, Gauge } from './components';
 
 const ComponentLibrary = {
   install (Vue, options = {}) {

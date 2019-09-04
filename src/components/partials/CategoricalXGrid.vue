@@ -1,5 +1,5 @@
 <template>
-  <g class="datavue-grid">
+  <Grid>
     <line
       v-for="label in displayLabels"
       :key="label.label"
@@ -8,11 +8,14 @@
       :x2="label.canvasX"
       :y2="canvasHeight"
     ></line>
-  </g>
+  </Grid>
 </template>
 
 <script>
+  import Grid from './Grid';
+
   export default {
+    components: { Grid },
     props: {
       displayLabels: Array,
       canvasHeight: Number

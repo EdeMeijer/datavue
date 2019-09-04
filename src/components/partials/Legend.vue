@@ -22,11 +22,18 @@
 </script>
 
 <style lang="scss">
+  @import "../../assets/variables.scss";
+
   .datavue-legend {
     font-size: 0.9em;
     position: absolute;
-    left: -35px;
-    right: -15px;
+    left: 0;
+    right: 0;
+
+    .with-grid & {
+      left: -$grid-margin-left;
+      right: -$grid-margin-right;
+    }
     margin-top: 2em;
     opacity: 0.65;
 

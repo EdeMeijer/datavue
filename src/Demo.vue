@@ -6,7 +6,7 @@
           {{ value }}%
         </template>
         <template v-slot:label="{ label }">
-          custom {{ label.name }}
+          Such {{ label.name }}
         </template>
       </BarChart>
     </div>
@@ -16,7 +16,7 @@
           {{ value }}%
         </template>
         <template v-slot:label="{ label }">
-          custom {{ label.name }}
+          My {{ label.name }}
         </template>
       </StackedBarChart>
     </div>
@@ -33,6 +33,13 @@
         </template>
       </PieChart>
     </div>
+    <div class="wrapper">
+      <Gauge title="Demo gauge" v-bind="gauge">
+        <template v-slot:value="{ value }">
+          {{ value }}%
+        </template>
+      </Gauge>
+    </div>
   </div>
 </template>
 
@@ -40,9 +47,10 @@
   import BarChart from './components/BarChart';
   import StackedBarChart from './components/StackedBarChart/StackedBarChart';
   import PieChart from './components/PieChart/PieChart';
+  import Gauge from './components/Gauge/Gauge';
 
   export default {
-    components: { PieChart, StackedBarChart, BarChart },
+    components: { Gauge, PieChart, StackedBarChart, BarChart },
     data () {
       return {
         chart: {
@@ -67,15 +75,18 @@
           data: [5, 2, 8, 14, 2, 2]
         },
         pie2: {
-          labels: ['fatal', 'error', 'warn', 'info', 'debug'],
-          data: [2, 9, 3, 10, 15],
+          labels: ['fatal', 'error', 'info', 'debug'],
+          data: [1, 3, 7, 19],
           colors: [
             '#880746',
             '#bf180d',
-            '#ae5c00',
             '#565989',
             '#aaa9aa'
           ]
+        },
+        gauge: {
+          value: 78,
+          max: 100
         }
       };
     }
@@ -83,9 +94,14 @@
 </script>
 
 <style>
+  body {
+    font-family: sans-serif;
+  }
+
   .wrapper {
-    width: 500px;
-    margin: 30px auto;
+    width: 400px;
+    margin: 15px;
+    float: left;
     background-color: #ebe8f2;
     padding: 30px;
     border-radius: 5px;

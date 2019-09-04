@@ -1,5 +1,5 @@
 <template>
-  <g class="datavue-grid">
+  <Grid>
     <line
       v-for="(yTick, index) in displayYTicks"
       :key="index"
@@ -8,11 +8,15 @@
       :x2="100"
       :y2="yTick.canvasValue"
     ></line>
-  </g>
+  </Grid>
 </template>
 
 <script>
+  import Grid from './Grid';
+
   export default {
+    components: { Grid },
+
     props: {
       displayYTicks: Array
     }

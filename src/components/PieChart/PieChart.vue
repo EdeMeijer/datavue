@@ -1,13 +1,13 @@
 <template>
-  <DataVue :title="title">
+  <DataVue :title="title" class="with-legend">
     <svg :viewBox="viewBox">
 
       <ellipse
         class="datavue-pie-outline"
         :cx="canvasCenterX"
         :cy="canvasCenterY"
-        :rx="canvasRadiusX"
-        :ry="canvasRadiusY"
+        :rx="canvasRadius"
+        :ry="canvasRadius"
       />
 
       <path
@@ -80,11 +80,8 @@
       canvasCenterY () {
         return this.yScale.project(0);
       },
-      canvasRadiusX () {
+      canvasRadius () {
         return this.xScale.scale(1.0);
-      },
-      canvasRadiusY () {
-        return Math.abs(this.yScale.scale(1.0));
       },
       slices () {
         const total = sum(this.data);
@@ -100,21 +97,20 @@
           return { x: this.xScale.project(Math.cos(angle)), y: this.yScale.project(Math.sin(angle)) };
         });
 
-        const rx = this.canvasRadiusX;
-        const ry = this.canvasRadiusY;
+        const r = this.canvasRadius;
         const cx = this.canvasCenterX;
         const cy = this.canvasCenterY;
 
         return startCoords.map(({ x, y }, i) => {
           const next = startCoords[(i + 1) % startCoords.length];
-          const thing = ratios[i] > 0.5 ? 1 : 0;
+          const big = ratios[i] > 0.5 ? 1 : 0;
           return {
             sidx: 0,
             pidx: i,
             corners: [{ x: cx, y: cy }, { x, y }, next],
             path: `
               M ${x},${y}
-              A ${rx},${ry} 0 ${thing} 1 ${next.x},${next.y}
+              A ${r},${r} 0 ${big} 1 ${next.x},${next.y}
               L ${cx},${cy}
               Z`,
             color: this.colors ? this.colors[i] : null,
@@ -131,8 +127,6 @@
         const label = this.labels[pidx];
 
         const anchor = maxBy(point.corners, c => -c.y);
-
-        console.log(anchor, this.yScale.reverse.project(anchor.y));
 
         const align = anchor.x > 50 ? 'right' : 'left';
 

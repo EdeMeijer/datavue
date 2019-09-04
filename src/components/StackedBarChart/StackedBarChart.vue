@@ -1,5 +1,5 @@
 <template>
-  <DataVue :title="title">
+  <DataVue :title="title" class="with-grid with-legend">
     <svg :viewBox="viewBox">
       <YGrid :displayYTicks="displayYTicks"/>
       <CategoricalXGrid :displayLabels="displayLabels" :canvasHeight="canvasHeight"/>
