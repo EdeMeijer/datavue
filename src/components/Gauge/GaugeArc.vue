@@ -4,6 +4,7 @@
 
 <script>
   import Scale from '../../Scale';
+  import { clamp } from 'lodash-es';
 
   export default {
     props: {
@@ -30,11 +31,17 @@
         return this.xScale.scale(this.radiusInner);
       },
       path () {
-        const effectiveLength = this.length * this.completion;
+        const clampedCompletion = clamp(this.completion, 0, 1);
+        const effectiveLength = this.length * clampedCompletion;
         const big = effectiveLength > 0.5 ? 1 : 0;
 
-        const startAngle = (1.5 - this.length) * -Math.PI;
-        const endAngle = ((1.0 - this.length) * 0.5 + 0.75 - this.completion) * 2 * Math.PI;
+        const marginRatio = (1.0 - this.length) * 0.5;
+        const offsetRatio = -0.25;
+        const startRatio = offsetRatio - marginRatio;
+        const endRatio = offsetRatio + marginRatio + (1.0 - clampedCompletion) * this.length;
+
+        const startAngle = startRatio * 2 * Math.PI;
+        const endAngle = endRatio * 2 * Math.PI;
 
         const startXOuter = this.xScale.project(Math.cos(startAngle));
         const startYOuter = this.yScale.project(Math.sin(startAngle));

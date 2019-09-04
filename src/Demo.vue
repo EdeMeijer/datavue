@@ -85,7 +85,7 @@
           ]
         },
         gauge: {
-          value: 78,
+          value: 25.9,
           max: 100
         }
       };
