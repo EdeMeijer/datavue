@@ -10,6 +10,7 @@
         class="davaue-gauge-background"
       />
       <GaugeArc
+        v-if="max !== null"
         :completion="value / max"
         :length="length"
         :width="width"
@@ -38,7 +39,7 @@
     mixins: [chartMixin],
     props: {
       value: { type: Number },
-      max: { type: Number },
+      max: { type: Number, default: null },
       margin: { type: Number, default: 0.02 },
       length: { type: Number, default: 0.75 },
       width: { type: Number, default: 0.25 }
