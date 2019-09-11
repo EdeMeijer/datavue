@@ -12,13 +12,15 @@
       />
 
       <Arc
-        v-if="max !== null"
-        :end="value / max"
+        v-for="(arc, i) in arcs"
+        :key="i"
+        :start="arc.start"
+        :end="arc.end"
         :width="width"
         :xScale="xScale"
         :yScale="yScale"
         :arcScale="arcScale"
-        class="davaue-gauge-foreground datavue-serie-1"
+        :class="['davaue-gauge-arc', arc.class]"
       />
     </svg>
     <div class="datavue-gauge-value-wrapper" :style="{'top': `${percentCenterY}%`}">
@@ -44,7 +46,13 @@
       max: { type: Number, default: null },
       margin: { type: Number, default: 0.02 },
       length: { type: Number, default: 0.75 },
-      width: { type: Number, default: 0.25 }
+      width: { type: Number, default: 0.25 },
+      stops: {
+        type: Array,
+        default: () => [
+          { to: 1.0, class: 'datavue-serie-1' }
+        ]
+      }
     },
     computed: {
       gaugeBottom () {
@@ -62,41 +70,40 @@
         return new Scale(-this.gaugeBottom - this.margin, 1 + this.margin, this.canvasHeight, 0);
       },
       arcScale () {
-        const marginRatio = (1.0 - this.length) * 0.5;
-        const offsetRatio = -0.25;
-        const startRatio = offsetRatio - marginRatio + 1;
-        const endRatio = offsetRatio + marginRatio;
-
-        const startAngle = startRatio * 2 * Math.PI;
-        const endAngle = endRatio * 2 * Math.PI;
-
-        return new Scale(
-          0,
-          1,
-          startAngle,
-          endAngle
-        );
+        const margin = (1.0 - this.length) * 0.5;
+        const offset = -0.25;
+        return new Scale(0, 1, (offset - margin + 1) * 2 * Math.PI, (offset + margin) * 2 * Math.PI);
       },
       yScalePercent () {
         return new Scale(-this.gaugeBottom - this.margin, 1 + this.margin, 100, 0);
       },
-      canvasCenterX () {
-        return this.xScale.project(0);
-      },
-      canvasCenterY () {
-        return this.yScale.project(0);
-      },
-      canvasRadiusOuter () {
-        return this.xScale.scale(1.0);
-      },
-      radiusInner () {
-        return 1.0 - this.width;
-      },
-      canvasRadiusInner () {
-        return this.xScale.scale(this.radiusInner);
-      },
       percentCenterY () {
         return this.yScalePercent.project(0);
+      },
+      arcs () {
+        if (this.max === null) {
+          return [];
+        }
+        const ratio = this.value / this.max;
+        const result = [];
+
+        let cur = 0.0;
+        for (const stop of this.stops) {
+          const to = Math.min(ratio, stop.to);
+
+          result.push({
+            start: cur,
+            end: to,
+            class: stop.class
+          });
+
+          if (stop.to >= ratio) {
+            break;
+          }
+          cur = to;
+        }
+
+        return result;
       }
     }
   };
@@ -110,7 +117,7 @@
     vector-effect: non-scaling-stroke;
   }
 
-  .davaue-gauge-foreground {
+  .davaue-gauge-arc {
     opacity: 0.7;
   }
 

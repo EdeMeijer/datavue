@@ -1,7 +1,7 @@
 <template>
   <div id="demo">
     <div class="wrapper">
-      <BarChart title="Demo bar chart" v-bind="chart">
+      <BarChart title="Bar chart" v-bind="chart">
         <template v-slot:value="{ value }">
           {{ value }}%
         </template>
@@ -11,7 +11,7 @@
       </BarChart>
     </div>
     <div class="wrapper">
-      <StackedBarChart title="Demo stacked bar chart" v-bind="chart">
+      <StackedBarChart title="Stacked bar chart" v-bind="chart">
         <template v-slot:value="{ value }">
           {{ value }}%
         </template>
@@ -21,10 +21,10 @@
       </StackedBarChart>
     </div>
     <div class="wrapper">
-      <PieChart title="Demo pie chart" v-bind="pie"></PieChart>
+      <PieChart title="Pie chart" v-bind="pie"></PieChart>
     </div>
     <div class="wrapper">
-      <PieChart title="Demo pie chart (custom colors)" v-bind="pie2">
+      <PieChart title="Pie chart with custom colors" v-bind="pie2">
         <template v-slot:value="{ value }">
           {{ value }} !!
         </template>
@@ -34,7 +34,14 @@
       </PieChart>
     </div>
     <div class="wrapper">
-      <Gauge title="Demo gauge" v-bind="gauge">
+      <Gauge title="Gauge" v-bind="gauge">
+        <template v-slot:value="{ value }">
+          {{ value }}%
+        </template>
+      </Gauge>
+    </div>
+    <div class="wrapper">
+      <Gauge title="Gauge with custom stops" v-bind="gauge2">
         <template v-slot:value="{ value }">
           {{ value }}%
         </template>
@@ -87,6 +94,16 @@
         gauge: {
           value: 25.9,
           max: 100
+        },
+        gauge2: {
+          value: 95,
+          max: 100,
+          stops: [
+            { to: 0.5, class: 'datavue-serie-2' },
+            { to: 0.75, class: 'datavue-serie-3' },
+            { to: 0.9, class: 'datavue-serie-4' },
+            { to: 1.0, class: 'datavue-serie-5' }
+          ]
         }
       };
     }
