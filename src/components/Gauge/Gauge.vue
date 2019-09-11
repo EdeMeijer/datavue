@@ -87,8 +87,9 @@
 <style lang="scss">
   .davaue-gauge-background {
     fill: rgba(133, 133, 133, 0.35);
-    stroke: rgba(0, 0, 0, 0.3);
-    stroke-width: 0.25;
+    stroke: rgba(0, 0, 0, 0.5);
+    stroke-width: 0.5px;
+    vector-effect: non-scaling-stroke;
   }
 
   .davaue-gauge-foreground {

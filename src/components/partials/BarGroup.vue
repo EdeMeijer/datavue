@@ -35,6 +35,7 @@
   .datavue-bar-group-outline {
     fill: transparent;
     stroke: rgba(0, 0, 0, 0.5);
-    stroke-width: 0.25;
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
   }
 </style>
