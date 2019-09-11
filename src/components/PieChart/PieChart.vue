@@ -10,14 +10,19 @@
         :ry="canvasRadius"
       />
 
-      <path
+      <Arc
         v-for="(slice, i) in slices"
         :key="labels[i]"
-        :d="slice.path"
+        :xScale="xScale"
+        :yScale="yScale"
+        :arcScale="arcScale"
+        :start="slice.start"
+        :end="slice.end"
+        :length="1"
         :class="[`datavue-serie-${i + 1}`, 'datavue-slice']"
         :style="{fill: slice.color}"
-        @mouseover="highlight(slice)"
-        @mouseout="unhighlight"
+        @mouseover.native="highlight(slice)"
+        @mouseout.native="unhighlight"
       />
 
     </svg>
@@ -46,10 +51,11 @@
   import Legend from '../partials/Legend';
   import { maxBy, sum } from 'lodash-es';
   import Scale from '../../Scale';
+  import Arc from '../partials/Arc';
 
   export default {
     name: 'pie-chart',
-    components: { Legend, Tooltip, DataVue },
+    components: { Arc, Legend, Tooltip, DataVue },
     mixins: [chartMixin],
     props: {
       labels: { type: Array, required: true },
@@ -71,6 +77,10 @@
       yScale () {
         return new Scale(-1 - this.margin, 1 + this.margin, this.canvasHeight, 0);
       },
+      arcScale () {
+        const offset = 0.5 * Math.PI;
+        return new Scale(0, 1, 2 * Math.PI + offset, +offset);
+      },
       yScalePercent () {
         return new Scale(-1 - this.margin, 1 + this.margin, 100, 0);
       },
@@ -84,37 +94,26 @@
         return this.xScale.scale(1.0);
       },
       slices () {
-        const total = sum(this.data);
-        let accum = 0.0;
-        const startAngles = [];
-        const ratios = [];
-        for (const value of this.data) {
-          ratios.push(value / total);
-          startAngles.push((accum / total) * 2.0 * Math.PI + Math.PI * 0.5);
-          accum -= value;
-        }
-        const startCoords = startAngles.map(angle => {
-          return { x: this.xScale.project(Math.cos(angle)), y: this.yScale.project(Math.sin(angle)) };
-        });
-
-        const r = this.canvasRadius;
         const cx = this.canvasCenterX;
         const cy = this.canvasCenterY;
 
-        return startCoords.map(({ x, y }, i) => {
-          const next = startCoords[(i + 1) % startCoords.length];
-          const big = ratios[i] > 0.5 ? 1 : 0;
+        const total = sum(this.data);
+
+        let accum = 0.0;
+
+        return this.data.map((value, i) => {
+          const start = accum / total;
+          accum += value;
+          const end = accum / total;
+
           return {
             sidx: 0,
             pidx: i,
-            corners: [{ x: cx, y: cy }, { x, y }, next],
-            path: `
-              M ${x},${y}
-              A ${r},${r} 0 ${big} 1 ${next.x},${next.y}
-              L ${cx},${cy}
-              Z`,
+            corners: [{ x: cx, y: cy }, this.calcCoord(start), this.calcCoord(end)],
+            start,
+            end,
             color: this.colors ? this.colors[i] : null,
-            value: this.data[i]
+            value: value
           };
         });
       },
@@ -137,6 +136,15 @@
           value: point.value,
           left: anchor.x,
           top: this.yScalePercent.project(this.yScale.reverse.project(anchor.y))
+        };
+      }
+    },
+    methods: {
+      calcCoord (rotation) {
+        const angle = this.arcScale.project(rotation);
+        return {
+          x: this.xScale.project(Math.cos(angle)),
+          y: this.yScale.project(Math.sin(angle))
         };
       }
     }
