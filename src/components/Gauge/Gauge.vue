@@ -1,21 +1,23 @@
 <template>
   <DataVue :title="title">
     <svg :viewBox="viewBox">
-      <GaugeArc
-        :completion="1.0"
+      <Arc
+        :end="1.0"
         :length="length"
         :width="width"
         :xScale="xScale"
         :yScale="yScale"
+        :arcScale="arcScale"
         class="davaue-gauge-background"
       />
-      <GaugeArc
+
+      <Arc
         v-if="max !== null"
-        :completion="value / max"
-        :length="length"
+        :end="value / max"
         :width="width"
         :xScale="xScale"
         :yScale="yScale"
+        :arcScale="arcScale"
         class="davaue-gauge-foreground datavue-serie-1"
       />
     </svg>
@@ -31,11 +33,11 @@
   import chartMixin from '../mixins/chartMixin';
   import DataVue from '../partials/DataVue';
   import Scale from '../../Scale';
-  import GaugeArc from './GaugeArc';
+  import Arc from '../partials/Arc';
 
   export default {
     name: 'gauge',
-    components: { GaugeArc, DataVue },
+    components: { Arc, DataVue },
     mixins: [chartMixin],
     props: {
       value: { type: Number },
@@ -46,7 +48,7 @@
     },
     computed: {
       gaugeBottom () {
-        return Math.cos(this.length);
+        return Math.max(Math.cos((this.length + 1) * Math.PI), 0.4);
       },
       gaugeHeight () {
         return 1.0 + this.gaugeBottom;
@@ -58,6 +60,22 @@
       },
       yScale () {
         return new Scale(-this.gaugeBottom - this.margin, 1 + this.margin, this.canvasHeight, 0);
+      },
+      arcScale () {
+        const marginRatio = (1.0 - this.length) * 0.5;
+        const offsetRatio = -0.25;
+        const startRatio = offsetRatio - marginRatio + 1;
+        const endRatio = offsetRatio + marginRatio;
+
+        const startAngle = startRatio * 2 * Math.PI;
+        const endAngle = endRatio * 2 * Math.PI;
+
+        return new Scale(
+          0,
+          1,
+          startAngle,
+          endAngle
+        );
       },
       yScalePercent () {
         return new Scale(-this.gaugeBottom - this.margin, 1 + this.margin, 100, 0);

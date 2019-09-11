@@ -4,15 +4,25 @@
 
 <script>
   import Scale from '../../Scale';
-  import { clamp } from 'lodash-es';
+
+  function normalizeAngle (angle) {
+    while (angle < 0) {
+      angle += 2 * Math.PI;
+    }
+    while (angle > 2 * Math.PI) {
+      angle -= 2 * Math.PI;
+    }
+    return angle;
+  }
 
   export default {
     props: {
-      completion: { type: Number },
-      length: { type: Number },
-      width: { type: Number },
+      start: { type: Number, default: 0.0 },
+      end: Number,
+      width: { type: Number, default: 1.0 },
       xScale: Scale,
-      yScale: Scale
+      yScale: Scale,
+      arcScale: Scale
     },
     computed: {
       canvasCenterX () {
@@ -31,17 +41,11 @@
         return this.xScale.scale(this.radiusInner);
       },
       path () {
-        const clampedCompletion = clamp(this.completion, 0, 1);
-        const effectiveLength = this.length * clampedCompletion;
-        const big = effectiveLength > 0.5 ? 1 : 0;
+        const startAngle = this.arcScale.project(this.start);
+        const endAngle = this.arcScale.project(this.end);
+        const arcAngle = normalizeAngle(startAngle - endAngle);
 
-        const marginRatio = (1.0 - this.length) * 0.5;
-        const offsetRatio = -0.25;
-        const startRatio = offsetRatio - marginRatio;
-        const endRatio = offsetRatio + marginRatio + (1.0 - clampedCompletion) * this.length;
-
-        const startAngle = startRatio * 2 * Math.PI;
-        const endAngle = endRatio * 2 * Math.PI;
+        const big = arcAngle > Math.PI ? 1 : 0;
 
         const startXOuter = this.xScale.project(Math.cos(startAngle));
         const startYOuter = this.yScale.project(Math.sin(startAngle));
@@ -54,13 +58,21 @@
         const rOuter = this.canvasRadiusOuter;
         const rInner = this.canvasRadiusInner;
 
-        return `
-          M ${startXOuter},${startYOuter}
-          A ${rOuter},${rOuter} 0 ${big} 1 ${endXOuter},${endYOuter}
-          L ${endXOuter},${endYOuter} ${endXInner},${endYInner}
-          A ${rInner},${rInner} 0 ${big} 0 ${startXInner},${startYInner}
-          Z
-        `;
+        const commands = [
+          // Move to the start on the outer circle
+          `M ${startXOuter},${startYOuter}`,
+          // Draw the arc to the end on the outer circle
+          `A ${rOuter},${rOuter} 0 ${big} 1 ${endXOuter},${endYOuter}`,
+          // Draw a line to the end on the inner circle
+          `L ${endXOuter},${endYOuter} ${endXInner},${endYInner}`
+        ];
+        if (rInner > 0) {
+          // Draw the arc to the start on the inner circle
+          commands.push(`A ${rInner},${rInner} 0 ${big} 0 ${startXInner},${startYInner}`);
+        }
+        // Close the path
+        commands.push('Z');
+        return commands.join(' ');
       }
     }
   };
