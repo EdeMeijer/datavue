@@ -110,9 +110,11 @@
   };
 </script>
 
-<style>
+<style lang="scss">
+  @import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
   body {
-    font-family: sans-serif;
+    font-family: "Open Sans", sans-serif;
   }
 
   .wrapper {

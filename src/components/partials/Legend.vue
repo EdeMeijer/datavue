@@ -38,8 +38,9 @@
     opacity: 0.65;
 
     & > div {
-      line-height: 0.9em;
-      padding: 4px 10px 2px 10px;
+      line-height: 20px;
+      font-size: 1em;
+      padding: 0 10px;
       color: white;
       border-radius: 5px;
       text-align: center;
