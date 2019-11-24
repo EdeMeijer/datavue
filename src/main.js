@@ -2,6 +2,7 @@ import * as components from './components';
 
 import '@/assets/global.scss';
 export { BarChart, StackedBarChart, PieChart, Gauge } from './components';
+export { default as Scale } from './Scale';
 
 const ComponentLibrary = {
   install (Vue, options = {}) {
