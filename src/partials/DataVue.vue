@@ -16,7 +16,8 @@
 </script>
 
 <style lang="scss">
-  @import "../../assets/variables.scss";
+  @import "src/assets/global";
+  @import "src/assets/variables";
 
   .datavue {
     position: relative;

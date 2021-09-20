@@ -48,7 +48,7 @@
   import { max, min } from 'lodash-es';
   import Legend from '../partials/Legend';
   import Tooltip from '../partials/Tooltip';
-  import Scale from '../../Scale';
+  import Scale from '../utils/Scale';
   import Bar from '../partials/Bar';
   import chartMixin from '../mixins/chartMixin';
   import yAxisMixin from '../mixins/yAxisMixin';

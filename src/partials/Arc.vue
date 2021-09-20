@@ -3,7 +3,7 @@
 </template>
 
 <script>
-  import Scale from '../../Scale';
+  import Scale from '../utils/Scale';
 
   function normalizeAngle (angle) {
     while (angle < 0) {

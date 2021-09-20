@@ -22,7 +22,7 @@
 </script>
 
 <style lang="scss">
-  @import "../../assets/variables.scss";
+  @import "src/assets/variables";
 
   .datavue-legend {
     font-size: 0.9em;

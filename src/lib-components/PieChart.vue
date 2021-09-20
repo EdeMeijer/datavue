@@ -50,7 +50,7 @@
   import Tooltip from '../partials/Tooltip';
   import Legend from '../partials/Legend';
   import { maxBy, sum } from 'lodash-es';
-  import Scale from '../../Scale';
+  import Scale from '../utils/Scale';
   import Arc from '../partials/Arc';
 
   export default {

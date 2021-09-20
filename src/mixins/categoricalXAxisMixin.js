@@ -1,4 +1,4 @@
-import Scale from '../../Scale';
+import Scale from '../utils/Scale';
 
 export default {
   props: {

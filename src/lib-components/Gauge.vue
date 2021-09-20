@@ -34,7 +34,7 @@
 <script>
   import chartMixin from '../mixins/chartMixin';
   import DataVue from '../partials/DataVue';
-  import Scale from '../../Scale';
+  import Scale from '../utils/Scale';
   import Arc from '../partials/Arc';
 
   export default {
